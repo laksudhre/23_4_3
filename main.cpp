@@ -1,41 +1,35 @@
 #include <iostream>
 #include <map>
-#include <ranges>
 
 #define WAGONS_COUNT 10
 #define OPTIMAL_PASSENGERS 20
-#define CALL(func, param) { func(param); }
-#define FOR(i, n) for (int i = 0; i < n; i++)
-#define FOR_AUTO(it, param) for (auto& it : std::views::values(param))
+#define CALL1(func, param) for (int i = 0; i < WAGONS_COUNT; ++i) { func(param, i); }
+#define CALL2(func, param1, param2, param3, param4) for (int i = 0; i < WAGONS_COUNT; ++i) { func(param1, param2, param3, param4, i); }
 
-void userInput(std::map<int, int>& passengersCount) {
-    FOR(i, WAGONS_COUNT) {
-        std::cout << "Enter the number of passengers on wagon " << (i + 1) << ": ";
-        int passengers = 0;
-        std::cin >> passengers;
-        passengersCount[i + 1] = passengers;
-    }
+void userInput(std::map<int, int>& passengers, const int& i) {
+    std::cout << "Enter passengers count for wagon " << i + 1 << ": ";
+    std::cin >> passengers[i];
 }
 
-void show(const std::map<int, int>& passengers) {
-    int lessOptimal = 0, moreOptimal = 0, passengersCount = 0;
-    FOR_AUTO(it, passengers) {
-        if (it < OPTIMAL_PASSENGERS) {
-            ++lessOptimal;
-        }
-        if (it > OPTIMAL_PASSENGERS) {
-            ++moreOptimal;
-        }
-        passengersCount += it;
+void checkPassengers(const std::map<int, int>& passengers, int& total, int& less, int& more, const int& i) {
+    const int current = passengers.at(i);
+    if (current < OPTIMAL_PASSENGERS) {
+        ++less;
+    } else if (current > OPTIMAL_PASSENGERS) {
+        ++more;
     }
-    std::cout << "Wagons with less than optimal passenger count: " << lessOptimal << std::endl;
-    std::cout << "Wagons with more than optimal passenger count: " << moreOptimal << std::endl;
-    std::cout << "Total passengers count: " << passengersCount << std::endl;
+    total += current;
 }
 
 int main() {
     std::map<int, int> passengers;
-    CALL(userInput, passengers);
-    CALL(show, passengers);
+    int totalPassengers = 0;
+    int lessPassengers = 0;
+    int morePassengers = 0;
+    CALL1(userInput, passengers);
+    CALL2(checkPassengers, passengers, totalPassengers, lessPassengers, morePassengers);
+    std::cout << "Total passengers: " << totalPassengers << std::endl;
+    std::cout << "Less passengers than optimal: " << lessPassengers << std::endl;
+    std::cout << "More passengers than optimal: " << morePassengers << std::endl;
     return 0;
 }
